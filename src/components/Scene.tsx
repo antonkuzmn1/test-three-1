@@ -10,7 +10,6 @@ function Scene() {
 
         const renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setAnimationLoop(animate);
         if (!ref.current) {
             return;
         }
@@ -23,23 +22,61 @@ function Scene() {
 
         camera.position.z = 5;
 
+        let isDragging = false;
+        let previousMousePosition = {
+            x: 0,
+            y: 0
+        };
+
+        const onMouseMove = (event: MouseEvent) => {
+            if (!isDragging) return;
+
+            const deltaMove = {
+                x: event.clientX - previousMousePosition.x,
+                y: event.clientY - previousMousePosition.y
+            };
+
+            cube.rotation.y += deltaMove.x * 0.01;
+            cube.rotation.x += deltaMove.y * 0.01;
+
+            previousMousePosition = {
+                x: event.clientX,
+                y: event.clientY
+            };
+        };
+
+        const onMouseDown = (event: MouseEvent) => {
+            isDragging = true;
+            previousMousePosition = {
+                x: event.clientX,
+                y: event.clientY
+            };
+        };
+
+        const onMouseUp = () => {
+            isDragging = false;
+        };
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mouseup', onMouseUp);
+
         function animate() {
-
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
-
             renderer.render(scene, camera);
-
         }
 
-        animate();
+        renderer.setAnimationLoop(animate);
 
         return () => {
             if (!ref.current) {
                 return;
             }
             ref.current.removeChild(renderer.domElement);
-        }
+
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mousedown', onMouseDown);
+            window.removeEventListener('mouseup', onMouseUp);
+        };
     }, []);
 
     return (
@@ -56,9 +93,8 @@ function Scene() {
                 position: 'fixed',
                 zIndex: -1,
             }}
-        >
-        </div>
+        />
     )
 }
 
-export default Scene
+export default Scene;
