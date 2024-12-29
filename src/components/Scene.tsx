@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {useEffect, useRef} from "react";
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 
 function Scene() {
     const ref = useRef<HTMLDivElement>(null);
@@ -15,50 +16,66 @@ function Scene() {
         }
         ref.current.appendChild(renderer.domElement);
 
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshBasicMaterial({color: 0x00ff00});
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
+        const light = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(light);
 
-        camera.position.z = 5;
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 10, 7.5);
+        scene.add(directionalLight);
+
+        const loader = new GLTFLoader();
+        let model: THREE.Object3D | null = null;
+        loader.load(
+            '/3d-models/data-center/scene.gltf',
+            // '/3d-models/test-1/test-2.glb',
+            // '/3d-models/data-center-custom/data_center.glb',
+            (gltf: any) => {
+                model = gltf.scene;
+                if (!model) {
+                    return;
+                }
+                model.position.set(0, 0, 0);
+                scene.add(model);
+            },
+            (xhr: any) => {
+                console.log(`Model loading: ${((xhr.loaded / xhr.total) * 100).toFixed(2)}%`);
+            },
+            (error: any) => {
+                console.error('Error loading model:', error);
+            }
+        );
+
+        camera.position.z = 10;
+        camera.position.y = 3;
 
         let isDragging = false;
-        let previousMousePosition = {
-            x: 0,
-            y: 0
-        };
-
-        const onMouseMove = (event: MouseEvent) => {
-            if (!isDragging) return;
-
-            const deltaMove = {
-                x: event.clientX - previousMousePosition.x,
-                y: event.clientY - previousMousePosition.y
-            };
-
-            cube.rotation.y += deltaMove.x * 0.01;
-            cube.rotation.x += deltaMove.y * 0.01;
-
-            previousMousePosition = {
-                x: event.clientX,
-                y: event.clientY
-            };
-        };
+        let previousMousePosition = {x: 0, y: 0};
 
         const onMouseDown = (event: MouseEvent) => {
             isDragging = true;
-            previousMousePosition = {
-                x: event.clientX,
-                y: event.clientY
+            previousMousePosition = {x: event.clientX, y: event.clientY};
+        };
+
+        const onMouseMove = (event: MouseEvent) => {
+            if (!isDragging || !model) return;
+
+            const deltaMove = {
+                x: event.clientX - previousMousePosition.x,
+                y: event.clientY - previousMousePosition.y,
             };
+
+            model.rotation.y += deltaMove.x * 0.01;
+            model.rotation.x += deltaMove.y * 0.01;
+
+            previousMousePosition = {x: event.clientX, y: event.clientY};
         };
 
         const onMouseUp = () => {
             isDragging = false;
         };
 
-        window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('mouseup', onMouseUp);
 
         function animate() {
@@ -73,8 +90,8 @@ function Scene() {
             }
             ref.current.removeChild(renderer.domElement);
 
-            window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('mousedown', onMouseDown);
+            window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('mouseup', onMouseUp);
         };
     }, []);
@@ -94,7 +111,7 @@ function Scene() {
                 zIndex: -1,
             }}
         />
-    )
+    );
 }
 
 export default Scene;

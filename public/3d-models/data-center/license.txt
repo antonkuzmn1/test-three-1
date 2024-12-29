@@ -1,0 +1,11 @@
+Model Information:
+* title:	Data Center (low-poly)
+* source:	https://sketchfab.com/3d-models/data-center-low-poly-59b31b45e80c484e98e1839ab1acc90b
+* author:	Alex Martire (https://sketchfab.com/alexmartire)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Data Center (low-poly)" (https://sketchfab.com/3d-models/data-center-low-poly-59b31b45e80c484e98e1839ab1acc90b) by Alex Martire (https://sketchfab.com/alexmartire) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
